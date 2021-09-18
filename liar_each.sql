@@ -5,8 +5,7 @@ CREATE TABLE `ktvs_admin_system_log` (
     `event_code` int(10) unsigned NOT NULL DEFAULT '0',
     `event_message` varchar(255) NOT NULL,
     `event_details` text,
-    `event_trace` text,
-    `process_id` bigint(20) unsigned NOT NULL DEFAULT '0',
+    `process_id` int(10) unsigned NOT NULL DEFAULT '0',
     `process_name` varchar(255) NOT NULL DEFAULT '',
     `added_date` datetime NOT NULL,
     `added_microtime` int(10) NOT NULL,
@@ -38,7 +37,6 @@ CREATE TABLE `ktvs_admin_conversion_servers` (
     `connection_type_id` tinyint(1) unsigned NOT NULL,
     `max_tasks` int(10) unsigned NOT NULL,
     `task_types` TEXT NOT NULL,
-    `is_allow_any_tasks` tinyint(1) unsigned NOT NULL,
     `process_priority` tinyint(3) unsigned NOT NULL,
     `option_storage_servers` tinyint(1) unsigned NOT NULL,
     `option_pull_source_files` tinyint(1) unsigned NOT NULL,
@@ -145,11 +143,6 @@ CREATE TABLE `ktvs_admin_servers_groups` (
     PRIMARY KEY (`group_id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci CHECKSUM=1 DELAY_KEY_WRITE=1 ROW_FORMAT=DYNAMIC;
 
-CREATE TABLE `ktvs_admin_system_extensions` (
-    `file_path` VARCHAR(255) NOT NULL,
-    PRIMARY KEY (`file_path`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 CHECKSUM=1 DELAY_KEY_WRITE=1 ROW_FORMAT=DYNAMIC;
-
 CREATE TABLE `ktvs_admin_users` (
     `user_id` int(10) unsigned NOT NULL auto_increment,
     `group_id` int(11) unsigned NOT NULL,
@@ -158,7 +151,6 @@ CREATE TABLE `ktvs_admin_users` (
     `is_expert_mode` tinyint(1) unsigned NOT NULL,
     `is_hide_forum_hints` tinyint(1) unsigned NOT NULL,
     `is_popups_enabled` tinyint(1) unsigned NOT NULL,
-    `is_old_list_navigation` tinyint(1) unsigned NOT NULL,
     `is_wysiwyg_enabled_videos` tinyint(1) unsigned NOT NULL,
     `is_wysiwyg_enabled_albums` tinyint(1) unsigned NOT NULL,
     `is_wysiwyg_enabled_posts` tinyint(1) unsigned NOT NULL,
@@ -276,7 +268,7 @@ CREATE TABLE `ktvs_albums_images` (
     `image_id` int(10) unsigned NOT NULL auto_increment,
     `album_id` int(10) unsigned NOT NULL default '0',
     `title` text NOT NULL,
-    `format` varchar(4) NOT NULL,
+    `format` varchar(3) NOT NULL,
     `rating` int(10) NOT NULL,
     `rating_amount` int(10) unsigned NOT NULL,
     `comments_count` int(10) unsigned NOT NULL,
@@ -683,7 +675,6 @@ CREATE TABLE `ktvs_content_sources` (
     `title` varchar(255) NOT NULL default '',
     `dir` varchar(255) NOT NULL,
     `description` text NOT NULL,
-    `synonyms` text NOT NULL,
     `screenshot1` varchar(100) NOT NULL default '',
     `screenshot2` varchar(100) NOT NULL default '',
     `url` varchar(255) NOT NULL default '',
@@ -779,7 +770,6 @@ CREATE TABLE `ktvs_dvds` (
     `dvd_group_id` int(10) unsigned not null,
     `sort_id` int(10) unsigned NOT NULL,
     `status_id` tinyint(1) unsigned NOT NULL default '1',
-    `release_year` int(10) unsigned NOT NULL,
     `is_video_upload_allowed` tinyint(1) unsigned not null,
     `is_review_needed` tinyint(1) unsigned NOT NULL,
     `rating` int(10) NOT NULL,
@@ -832,6 +822,7 @@ CREATE TABLE `ktvs_dvds_groups` (
     `custom3` text NOT NULL,
     `custom4` text NOT NULL,
     `custom5` text NOT NULL,
+    `total_dvds` int(10) unsigned NOT NULL,
     `added_date` datetime NOT NULL,
     PRIMARY KEY (`dvd_group_id`),
     KEY `dir` (`dir`),
@@ -1107,9 +1098,7 @@ CREATE TABLE `ktvs_formats_videos` (
     `customize_offset_start_id` int(10) NOT NULL,
     `customize_offset_end_id` int(10) NOT NULL,
     `preroll_video_uploaded` tinyint(1) NOT NULL,
-    `customize_preroll_video_id` tinyint(2) NOT NULL,
     `postroll_video_uploaded` tinyint(1) NOT NULL,
-    `customize_postroll_video_id` tinyint(2) NOT NULL,
     `limit_speed_option` tinyint(1) NOT NULL,
     `limit_speed_value` float NOT NULL,
     `limit_speed_guests_option` tinyint(1) NOT NULL,
@@ -1309,7 +1298,6 @@ CREATE TABLE `ktvs_models` (
     `comments_count` int(10) unsigned NOT NULL,
     `subscribers_count` int(10) unsigned NOT NULL,
     `access_level_id` tinyint(1) NOT NULL,
-    `gallery_url` varchar(255) NOT NULL,
     `custom1` text NOT NULL,
     `custom2` text NOT NULL,
     `custom3` text NOT NULL,
@@ -1349,8 +1337,7 @@ CREATE TABLE `ktvs_models` (
     KEY `dir` (`dir`),
     KEY `status_id` (`status_id`),
     KEY `access_level_id` (`access_level_id`),
-    KEY `rank` (`rank`),
-    KEY `gallery_url` (`gallery_url`)
+    KEY `rank` (`rank`)
 ) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 CHECKSUM=1 DELAY_KEY_WRITE=1 ROW_FORMAT=DYNAMIC;
 
 CREATE TABLE `ktvs_models_groups` (
@@ -2265,7 +2252,6 @@ CREATE TABLE `ktvs_videos_advanced_operations` (
     `operation_type_id` TINYINT(2) UNSIGNED NOT NULL,
     `operation_status_id` TINYINT(2) UNSIGNED NOT NULL,
     `operation_task_id` VARCHAR(100) NOT NULL DEFAULT '',
-    `operation_data` TEXT NOT NULL,
     `added_date` DATETIME NOT NULL,
     `finished_date` DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00',
     KEY `video_id` (`video_id`),
@@ -2322,6 +2308,57 @@ insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values (
 insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values ('videos|export',                    '60','200');
 insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values ('videos|delete',                    '70','200');
 insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values ('videos|feeds_import',              '80','200');
+insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values ('videos|feeds_export',              '90','200');
+
+insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values ('albums|view',                      '1', '300');
+insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values ('albums|add',                       '2', '300');
+insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values ('albums|edit_all',                  '3', '300');
+insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values ('albums|edit_title',                '4', '300');
+insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values ('albums|edit_dir',                  '5', '300');
+insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values ('albums|edit_description',          '6', '300');
+insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values ('albums|edit_post_date',            '7', '300');
+insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values ('albums|edit_user',                 '8', '300');
+insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values ('albums|edit_status',               '9', '300');
+insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values ('albums|edit_type',                 '10','300');
+insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values ('albums|edit_access_level',         '11','300');
+insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values ('albums|edit_tokens',               '12','300');
+insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values ('albums|edit_content_source',       '13','300');
+insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values ('albums|edit_categories',           '14','300');
+insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values ('albums|edit_tags',                 '15','300');
+insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values ('albums|edit_models',               '16','300');
+insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values ('albums|edit_flags',                '17','300');
+insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values ('albums|edit_custom',               '18','300');
+insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values ('albums|edit_admin_flag',           '19','300');
+insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values ('albums|edit_is_locked',            '20','300');
+insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values ('albums|edit_storage',              '21','300');
+insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values ('albums|delete',                    '40','300');
+insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values ('albums|manage_images',             '50','300');
+insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values ('albums|import',                    '60','300');
+insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values ('albums|export',                    '70','300');
+
+insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values ('posts_types|view',                 '1', '400');
+insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values ('posts_types|add',                  '2', '400');
+insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values ('posts_types|edit_all',             '3', '400');
+insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values ('posts_types|delete',               '4', '400');
+
+insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values ('posts|view',                       '1', '500');
+insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values ('posts|add',                        '2', '500');
+insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values ('posts|edit_all',                   '3', '500');
+insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values ('posts|edit_title',                 '4', '500');
+insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values ('posts|edit_dir',                   '5', '500');
+insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values ('posts|edit_description',           '6', '500');
+insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values ('posts|edit_content',               '7', '500');
+insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values ('posts|edit_post_date',             '8', '500');
+insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values ('posts|edit_user',                  '9', '500');
+insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values ('posts|edit_status',                '10','500');
+insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values ('posts|edit_type',                  '11','500');
+insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values ('posts|edit_categories',            '12','500');
+insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values ('posts|edit_tags',                  '13','500');
+insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values ('posts|edit_models',                '14','500');
+insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values ('posts|edit_flags',                 '15','500');
+insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values ('posts|edit_custom',                '16','500');
+insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values ('posts|edit_is_locked',             '17','500');
+insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values ('posts|delete',                     '30','500');
 
 insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values ('categories|view',                  '1', '600');
 insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values ('categories|add',                   '2', '600');
@@ -2332,6 +2369,16 @@ insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values (
 insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values ('category_groups|add',              '2', '700');
 insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values ('category_groups|edit_all',         '3', '700');
 insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values ('category_groups|delete',           '4', '700');
+
+insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values ('models|view',                      '1', '800');
+insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values ('models|add',                       '2', '800');
+insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values ('models|edit_all',                  '3', '800');
+insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values ('models|delete',                    '4', '800');
+
+insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values ('models_groups|view',               '1', '850');
+insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values ('models_groups|add',                '2', '850');
+insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values ('models_groups|edit_all',           '3', '850');
+insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values ('models_groups|delete',             '4', '850');
 
 insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values ('tags|view',                        '1', '900');
 insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values ('tags|add',                         '2', '900');
@@ -2353,10 +2400,40 @@ insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values (
 insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values ('flags|edit_all',                   '3', '1100');
 insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values ('flags|delete',                     '4', '1100');
 
+insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values ('dvds|view',                        '1', '1200');
+insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values ('dvds|add',                         '2', '1200');
+insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values ('dvds|edit_all',                    '3', '1200');
+insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values ('dvds|delete',                      '4', '1200');
+
+insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values ('dvds_groups|view',                 '1', '1300');
+insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values ('dvds_groups|add',                  '2', '1300');
+insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values ('dvds_groups|edit_all',             '3', '1300');
+insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values ('dvds_groups|delete',               '4', '1300');
+
 insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values ('users|view',                       '1', '1400');
+insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values ('users|add',                        '2', '1400');
 insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values ('users|edit_all',                   '3', '1400');
 insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values ('users|delete',                     '4', '1400');
 insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values ('users|manage_comments',            '5', '1400');
+insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values ('users|manage_awards',              '6', '1400');
+insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values ('users|manage_blogs',               '7', '1400');
+insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values ('users|emailings',                  '8', '1400');
+
+insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values ('messages|view',                    '1', '1500');
+insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values ('messages|add',                     '2', '1500');
+insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values ('messages|edit_all',                '3', '1500');
+insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values ('messages|delete',                  '4', '1500');
+
+insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values ('playlists|view',                   '1', '1550');
+insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values ('playlists|add',                    '2', '1550');
+insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values ('playlists|edit_all',               '3', '1550');
+insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values ('playlists|delete',                 '4', '1550');
+
+insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values ('billing|view',                     '1', '1600');
+insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values ('billing|edit_all',                 '2', '1600');
+
+insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values ('payouts|view',                     '1', '1650');
+insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values ('payouts|edit_all',                 '2', '1650');
 
 insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values ('feedbacks|view',                   '1', '1700');
 insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values ('feedbacks|edit_all',               '2', '1700');
@@ -2374,6 +2451,7 @@ insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values (
 
 insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values ('stats|view_traffic_stats',         '1', '2000');
 insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values ('stats|view_content_stats',         '3', '2000');
+insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values ('stats|view_user_stats',            '4', '2000');
 insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values ('stats|manage_referers',            '5', '2000');
 insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values ('stats|manage_search_queries',      '6', '2000');
 
@@ -2398,14 +2476,15 @@ insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values (
 insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values ('plugins|content_stats',            '20','2100');
 insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values ('plugins|migrator',                 '21','2100');
 insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values ('plugins|grabbers',                 '22','2100');
+insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values ('plugins|users_generator',          '23','2100');
 insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values ('plugins|custom_post_processing',   '24','2100');
 insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values ('plugins|recaptcha',                '25','2100');
 insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values ('plugins|push_notifications',       '26','2100');
 insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values ('plugins|neuroscore',               '28','2100');
-insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values ('plugins|digiregs',                 '29','2100');
 
 insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values ('system|system_settings',           '1', '2200');
 insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values ('system|website_settings',          '2', '2200');
+insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values ('system|memberzone_settings',       '3', '2200');
 insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values ('system|antispam_settings',         '4', '2200');
 insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values ('system|customization',             '5', '2200');
 insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values ('system|formats',                   '6', '2200');
@@ -2415,6 +2494,9 @@ insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values (
 insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values ('system|stats_settings',            '10','2200');
 insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values ('system|player_settings',           '11','2200');
 insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values ('system|vast_profiles',             '12','2200');
+insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values ('system|localization',              '9', '2200');
+
+insert into `ktvs_admin_permissions`(`title`,`sort_id`,`group_sort_id`) values ('localization|view',                '1', '2300');
 
 /* ========================================================================== */
 /* Administrator                                                              */
@@ -2962,6 +3044,9 @@ insert into `ktvs_admin_conversion_servers`(`server_id`,`title`,`status_id`,`con
 insert into `ktvs_admin_servers_groups`(`group_id`,`title`,`content_type_id`,`status_id`,`added_date`) values ('1','Group Videos','1','1',NOW());
 insert into `ktvs_admin_servers`(`server_id`,`group_id`,`title`,`content_type_id`,`status_id`,`connection_type_id`,`streaming_type_id`,`path`,`urls`,`added_date`) values ('1','1','Local Videos','1','1','0','0','%PROJECT_PATH%/contents/videos','https://www.liarxxx.com/contents/videos',NOW());
 
+insert into `ktvs_admin_servers_groups`(`group_id`,`title`,`content_type_id`,`status_id`,`added_date`) values ('2','Group Albums','2','1',NOW());
+insert into `ktvs_admin_servers`(`server_id`,`group_id`,`title`,`content_type_id`,`status_id`,`connection_type_id`,`streaming_type_id`,`path`,`urls`,`added_date`) values ('2','2','Local Albums','2','1','0','0','%PROJECT_PATH%/contents/albums','https://www.liarxxx.com/contents/albums',NOW());
+
 /* ========================================================================== */
 /* Website default users                                                      */
 /* ========================================================================== */
@@ -2996,7 +3081,11 @@ insert into `ktvs_card_bill_providers`(`status_id`,`internal_id`,`title`,`url`,`
 /* Theme                                                                      */
 /* ========================================================================== */
 
-insert into `ktvs_formats_videos`(`title`,`postfix`,`status_id`,`is_conditional`,`video_type_id`,`size`,`resize_option`,`resize_option2`,`ffmpeg_options`,`limit_number_parts`,`limit_total_duration`,`added_date`) values ('MP4',        '.mp4',        '1','0','0','',         '2','2','-vcodec libx264 -movflags +faststart -threads 0 -r 25 -g 50 -crf 25 -me_method hex -trellis 0 -bf 8 -acodec aac -strict -2 -ar 44100 -ab 128k -f mp4','1','0', NOW());
+insert into `ktvs_formats_videos`(`title`,`postfix`,`status_id`,`is_conditional`,`video_type_id`,`size`,`resize_option`,`resize_option2`,`ffmpeg_options`,`limit_number_parts`,`limit_total_duration`,`added_date`) values ('MP4  480p',  '.mp4',        '1','0','0','848x480',  '1','2','-vcodec libx264 -movflags +faststart -threads 0 -r 25 -g 50 -crf 25 -me_method hex -trellis 0 -bf 8 -acodec aac -strict -2 -ar 44100 -ab 128k -f mp4','1','0', NOW());
+insert into `ktvs_formats_videos`(`title`,`postfix`,`status_id`,`is_conditional`,`video_type_id`,`size`,`resize_option`,`resize_option2`,`ffmpeg_options`,`limit_number_parts`,`limit_total_duration`,`added_date`) values ('MP4  720p',  '_720p.mp4',   '2','1','0','1280x720', '1','2','-vcodec libx264 -movflags +faststart -threads 0 -r 25 -g 50 -crf 25 -me_method hex -trellis 0 -bf 8 -acodec aac -strict -2 -ar 44100 -ab 128k -f mp4','1','0', NOW());
+insert into `ktvs_formats_videos`(`title`,`postfix`,`status_id`,`is_conditional`,`video_type_id`,`size`,`resize_option`,`resize_option2`,`ffmpeg_options`,`limit_number_parts`,`limit_total_duration`,`added_date`) values ('MP4 1080p',  '_1080p.mp4',  '2','1','0','1920x1080','1','2','-vcodec libx264 -movflags +faststart -threads 0 -r 25 -g 50 -crf 25 -me_method hex -trellis 0 -bf 8 -acodec aac -strict -2 -ar 44100 -ab 128k -f mp4','1','0', NOW());
+insert into `ktvs_formats_videos`(`title`,`postfix`,`status_id`,`is_conditional`,`video_type_id`,`size`,`resize_option`,`resize_option2`,`ffmpeg_options`,`limit_number_parts`,`limit_total_duration`,`added_date`) values ('MP4 4k',     '_2160p.mp4',  '2','1','0','4096x2160','1','2','-vcodec libx264 -movflags +faststart -threads 0 -r 25 -g 50 -crf 25 -me_method hex -trellis 0 -bf 8 -acodec aac -strict -2 -ar 44100 -ab 128k -f mp4','1','0', NOW());
+insert into `ktvs_formats_videos`(`title`,`postfix`,`status_id`,`is_conditional`,`video_type_id`,`size`,`resize_option`,`resize_option2`,`ffmpeg_options`,`limit_number_parts`,`limit_total_duration`,`added_date`) values ('MP4 Preview','_preview.mp4','1','0','0','320x180',  '1','1','-vcodec libx264 -movflags +faststart -threads 0 -r 25 -g 50 -crf 25 -me_method hex -trellis 0 -bf 8 -an -f mp4',                                      '5','20',NOW());
 
 update `ktvs_formats_videos` set `is_timeline_enabled`=1, `timeline_option`=2, `timeline_interval`=10, `timeline_directory`='mp4' where postfix='.mp4';
 
@@ -3026,9 +3115,6 @@ update `ktvs_options` set `value`='2' where `variable`='PREMIUM_ALBUMS_ACCESS';
 update `ktvs_options` set `value`='1' where `variable`='ENABLE_CATEGORY_FIELD_1';
 update `ktvs_options` set `value`='1' where `variable`='ENABLE_CATEGORY_FIELD_2';
 update `ktvs_options` set `value`='1' where `variable`='ENABLE_CATEGORY_FIELD_3';
-update `ktvs_options` set `value`='1' where `variable`='ENABLE_TAG_FIELD_1';
-update `ktvs_options` set `value`='1' where `variable`='ENABLE_TAG_FIELD_2';
-update `ktvs_options` set `value`='1' where `variable`='ENABLE_TAG_FIELD_3';
 update `ktvs_options` set `value`='1' where `variable`='ENABLE_CS_FIELD_1';
 update `ktvs_options` set `value`='1' where `variable`='ENABLE_CS_FIELD_2';
 update `ktvs_options` set `value`='1' where `variable`='ENABLE_CS_FIELD_3';
@@ -3041,9 +3127,6 @@ update `ktvs_options` set `value`='1' where `variable`='ENABLE_DVD_FIELD_1';
 update `ktvs_options` set `value`='HTML title' where `variable`='CATEGORY_FIELD_1_NAME';
 update `ktvs_options` set `value`='HTML desc' where `variable`='CATEGORY_FIELD_2_NAME';
 update `ktvs_options` set `value`='SEO text' where `variable`='CATEGORY_FIELD_3_NAME';
-update `ktvs_options` set `value`='HTML title' where `variable`='TAG_FIELD_1_NAME';
-update `ktvs_options` set `value`='HTML desc' where `variable`='TAG_FIELD_2_NAME';
-update `ktvs_options` set `value`='SEO text' where `variable`='TAG_FIELD_3_NAME';
 update `ktvs_options` set `value`='Content quality' where `variable`='CS_FIELD_1_NAME';
 update `ktvs_options` set `value`='Content quantity' where `variable`='CS_FIELD_2_NAME';
 update `ktvs_options` set `value`='Originality' where `variable`='CS_FIELD_3_NAME';
